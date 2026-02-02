@@ -36,13 +36,6 @@ app.MapGet("/weatherforecast", () =>
 .WithName("GetWeatherForecast")
 .WithOpenApi();
 
-app.MapGet("/", () =>
-{
-    return "Hi Welcome to Disaster Resource Allocation API";
-})
-.WithName("index")
-.WithOpenApi();
-
 app.Run();
 
 record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)

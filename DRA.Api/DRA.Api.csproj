@@ -4,7 +4,6 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <RootNamespace>DRA_API</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,8 +11,8 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 
-  <!-- <ItemGroup>
-    <ProjectReference Include="DRA-API.csproj" />
-  </ItemGroup> -->
+  <ItemGroup>
+    <ProjectReference Include="..\DRA.Core\DRA.Core.csproj" />
+  </ItemGroup>
 
 </Project>

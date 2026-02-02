@@ -22,4 +22,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\DRA.Core\DRA.Core.csproj" />
+  </ItemGroup>
+
 </Project>
