@@ -1,19 +1,8 @@
-
-using System.Data.Common;
-using System.Diagnostics;
-using System.Runtime.Serialization;
-
 public class ResourceMapper
 {
     public string areaId;
     public string truckId;
     public Dictionary<string, int> resourcesDelivered;
-    public ResourceMapper(string areaId, string truckId, Dictionary<string, int> resourcesDelivered)
-    {
-        this.areaId = areaId;
-        this.truckId = truckId;
-        this.resourcesDelivered = resourcesDelivered;
-    }
     public override string ToString()
     {
         var lines = this.resourcesDelivered.Select(kvp => kvp.Key + ": " + kvp.Value.ToString());
@@ -30,52 +19,89 @@ public class SortArea : IComparer<Area>
         return y.getUrgencyLevel() - x.getUrgencyLevel();
     }
 }
+public class ResultAfterMap
+{
+    public ResourceMapper mapped;
+    public List<Truck> remainTrucks;
+    public Area areaDelivered;
+    public Truck truckDelivered;
+}
+public class ResourceManagementResult
+{
+    public ResultAfterMap? successedCase;
+    public ErrorCase? errorCase;
 
-
-
-
+}
+public class ErrorCase
+{
+    public string areaId;
+    public string reason;
+}
 public class ResourceManagement
 {
-    private List<Area> areas = new List<Area>();
-    private List<Truck> trucks = new List<Truck>();
-    public ResourceManagement() { }
-
-    public List<Area> allAreas() => this.areas;
-    public List<Truck> allTracks() => this.trucks;
-
-    public void AddArea(int urgencyLevel, Dictionary<string, int> requiredResources, int timeConstraint)
+    private ResultAfterMap resourceDelivery(Area area, List<Truck> trucks)
     {
-        areas.Add(new Area("A" + (areas.Count() + 1), urgencyLevel, requiredResources, timeConstraint));
-    }
-    public void AddTrack(Dictionary<string, int> avaliableResources, Dictionary<string, int> travelTimeToArea)
-    {
-        trucks.Add(new Truck("T" + (trucks.Count() + 1), avaliableResources, travelTimeToArea));
-    }
-    private ResourceMapper[] computed(List<Area> areas, List<Truck> trucks)
-    {
-        if (areas.Count() == 0 || trucks.Count() == 0) return [];
-        var firstArea = areas.FirstOrDefault();
-        if (firstArea == null) return [];
-        var areaKey = firstArea.getId();
-        var truckCanDelivery = trucks.Where(truck =>
-        {
-            var isCanDilivery = firstArea.getRequiredResources().All((item) =>
+        if (trucks.Count() == 0) throw new Exception("no trucks avaliable");
+        var areaKey = area.getId();
+        var truckResourceAvaliable = trucks.Where(truck => area.getRequiredResources().All((item) =>
+            {
+                truck.getAvaliableResources().TryGetValue(item.Key, out var trackItem);
+                return trackItem >= item.Value;
+            })
+        );
+        var truckCanDelivery = truckResourceAvaliable.Where(truck => area.getRequiredResources().All((item) =>
             {
                 truck.getTravelTimeToArea().TryGetValue(areaKey, out var timeDelivery);
-                truck.getAvaliableResources().TryGetValue(item.Key, out var trackItem);
-                return trackItem >= item.Value && firstArea.getTimeConstraint() >= timeDelivery;
-            });
-            return isCanDilivery;
-        });
+                return area.getTimeConstraint() >= timeDelivery;
+            })
+        );
         var truckUsage = truckCanDelivery.FirstOrDefault();
-        if (truckUsage == null) return [];
-        var resourceMapped = new ResourceMapper(areaKey, truckUsage.getId(), firstArea.getRequiredResources());
-        return [resourceMapped, .. computed(areas.Skip(1).ToList(), trucks.Where(x => x != truckUsage).ToList())];
+        if (truckUsage == null) throw new Exception("No trucks available to meet the time constraint");
+        var resourceMapped = new ResourceMapper { areaId = areaKey, truckId = truckUsage.getId(), resourcesDelivered = area.getRequiredResources() };
+        return new ResultAfterMap
+        {
+            mapped = resourceMapped,
+            remainTrucks = trucks.Where(x => x != truckUsage).ToList(),
+            areaDelivered = area,
+            truckDelivered = truckUsage
+        };
     }
-    public ResourceMapper[] computedResource()
+    private ResourceManagementResult[] computed(List<Area> areas, List<Truck> trucks)
     {
+        var areaNeedToDelivery = areas.FirstOrDefault();
+        if (areaNeedToDelivery == null) return [];
+        var remainAreas = areas.Skip(1).ToList();
+        try
+        {
+            var resourceMapped = resourceDelivery(areaNeedToDelivery, trucks);
+            if (resourceMapped == null) return [];
+            return [
+                new ResourceManagementResult { successedCase = resourceMapped, errorCase = null },
+                 .. computed(remainAreas, resourceMapped.remainTrucks)
+                 ];
+        }
+        catch (Exception ex)
+        {
+
+            var errorCase = new ErrorCase
+            {
+                areaId = areaNeedToDelivery.getId(),
+                reason = ex.Message
+            };
+            return [
+                new ResourceManagementResult { successedCase = null, errorCase=errorCase},
+                 .. computed(remainAreas,trucks)
+                 ];
+        }
+    }
+    public ResourceManagementResult[] computedResource(List<Area> areas, List<Truck> trucks)
+    {
+        var _areas = new List<Area>(areas);
         var sorter = new SortArea();
-        this.areas.Sort(sorter);
-        return this.computed(this.areas, this.trucks);
+        _areas.Sort(sorter);
+        var resourcesMapped = this.computed(_areas, trucks);
+        if (resourcesMapped.Length == 0 && _areas.Count() != 0)
+            throw new Exception("Insufficient resources for any area.");
+        return resourcesMapped;
     }
 }
