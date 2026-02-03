@@ -3,7 +3,10 @@ using TruckApi.Models;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = null;
+    });
 builder.Services.AddDbContext<AppContext>(options =>
     options.UseMySql(
         builder.Configuration.GetConnectionString("Default"),

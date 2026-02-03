@@ -1,8 +1,8 @@
 public class ResourceMapper
 {
-    public string areaId;
-    public string truckId;
-    public Dictionary<string, int> resourcesDelivered;
+    public required string areaId { get; set; }
+    public required string truckId { get; set; }
+    public required Dictionary<string, int> resourcesDelivered { get; set; }
     public override string ToString()
     {
         var lines = this.resourcesDelivered.Select(kvp => kvp.Key + ": " + kvp.Value.ToString());
@@ -21,21 +21,21 @@ public class SortArea : IComparer<Area>
 }
 public class ResultAfterMap
 {
-    public ResourceMapper mapped;
-    public List<Truck> remainTrucks;
-    public Area areaDelivered;
-    public Truck truckDelivered;
+    public required ResourceMapper mapped { get; set; }
+    public required List<Truck> remainTrucks { get; set; }
+    public required Area areaDelivered { get; set; }
+    public required Truck truckDelivered { get; set; }
 }
 public class ResourceManagementResult
 {
-    public ResultAfterMap? successedCase;
-    public ErrorCase? errorCase;
+    public ResultAfterMap? successedCase { get; set; }
+    public ErrorCase? errorCase { get; set; }
 
 }
 public class ErrorCase
 {
-    public string areaId;
-    public string reason;
+    public required string areaId { get; set; }
+    public required string reason { get; set; }
 }
 public class ResourceManagement
 {
