@@ -50,6 +50,9 @@ public class UnitTest1
             new Truck("T2",resourcesForT2,timeToAreaT2),
         };
         var result = dra_mn.computedResource(areas, trucks);
+        Console.WriteLine(result[0].successedCase.areaDelivered);
+        Console.WriteLine(result[0].successedCase.truckDelivered);
+        Console.WriteLine(result[0].successedCase.mapped);
         Assert.Equivalent(expectedResult, result.Where(x => x.successedCase != null).Select(x => x.successedCase!.mapped).ToArray());
     }
 

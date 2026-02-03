@@ -15,7 +15,7 @@ public class Area
     {
         var lines = this.requiredResources.Select(kvp => kvp.Key + ": " + kvp.Value.ToString());
         var resource = string.Join(",", lines);
-        return $"area id  :{this.areaId}[urgency {this.urgencyLevel}] need ${resource} can wait ${this.timeConstraint}\n";
+        return $"area id  :{this.areaId}[urgency {this.urgencyLevel}] need {resource} can wait {this.timeConstraint}\n";
     }
     public string getId() => this.areaId;
     public int getUrgencyLevel() => this.urgencyLevel;
