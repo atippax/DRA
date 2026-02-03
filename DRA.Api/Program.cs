@@ -1,7 +1,15 @@
+using TruckApi.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
+builder.Services.AddDbContext<AppContext>(options =>
+    options.UseMySql(
+        builder.Configuration.GetConnectionString("Default"),
+        new MySqlServerVersion(new Version(9, 0, 0))
+        ));
+
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
