@@ -7,6 +7,7 @@ builder.Services.AddControllers().AddJsonOptions(options =>
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
 
     });
+// builder.Services.AddScoped<IResourceManagement, ResourceManagement>();
 builder.Services.AddDbContext<AppContext>(options =>
     options.UseMySql(
         builder.Configuration.GetConnectionString("Default"),

@@ -17,4 +17,7 @@ public class AreaModel
 
     [Column("urgency_level")]
     public int urgencyLevel { get; set; }
+
+    [Column("has_delivered")]
+    public bool hasDelivered { get; set; }
 }

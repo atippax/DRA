@@ -37,7 +37,11 @@ public class ErrorCase
     public required string areaId { get; set; }
     public required string reason { get; set; }
 }
-public class ResourceManagement
+public interface IResourceManagement
+{
+    public ResourceManagementResult[] computedResource(List<Area> areas, List<Truck> trucks);
+}
+public class ResourceManagement : IResourceManagement
 {
     private ResultAfterMap resourceDelivery(Area area, List<Truck> trucks)
     {

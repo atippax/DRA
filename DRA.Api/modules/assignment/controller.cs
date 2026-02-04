@@ -1,68 +1,79 @@
+using System.Threading.Tasks;
+
 [Route("[controller]")]
 [ApiController]
-public class AssignmentController : ControllerBase
+public class AssignmentsController : ControllerBase
 {
+    private readonly AppContext context;
+    private readonly IResourceManagement resourceManagement;
+
+    public AssignmentsController(AppContext _context, IResourceManagement resourceManagement)
+    {
+        this.context = _context;
+        this.resourceManagement = resourceManagement;
+    }
+
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public ActionResult<string> index()
     {
-        return "hi";
+        return "return redis cache";
     }
 
-    [HttpGet("test")]
+
+    [HttpDelete]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public ActionResult<ResourceManagementResult[]> assignment()
+    public ActionResult<string> delete()
     {
-        var resourcesForA1 = new Dictionary<string, int>
-            {
-                {"food",200},
-                {"water",300},
-            };
-        var resourcesForA2 = new Dictionary<string, int>
-            {
-                {"medicine",50},
-            };
-        var resourcesForT1 = new Dictionary<string, int>
-            {
-                {"food",250},
-                {"water",300},
-            };
-        var timeToAreaT1 = new Dictionary<string, int>
-        {
-          {"A1",5},
-          {"A2",3}
-        };
-        var resourcesForT2 = new Dictionary<string, int>
-            {
-                {"medicine",60}
-            };
-        var timeToAreaT2 = new Dictionary<string, int>
-             {
-          {"A1",4},
-          {"A2",2}
-        };
-        var dra_mn = new ResourceManagement();
-        var expectedResult = new ResourceMapper[]
-        {
-            new ResourceMapper{areaId="A1",truckId="T1",resourcesDelivered=resourcesForA1},
-            new ResourceMapper{areaId="A2",truckId="T2",resourcesDelivered=resourcesForA2},
-        };
-        var areas = new List<Area>
-        {
-            new Area("A1",5, resourcesForA1, 6),
-            new Area("A2",4, resourcesForA2, 4),
-        };
-        var trucks = new List<Truck>
-        {
-            new Truck("T1",resourcesForT1,timeToAreaT1),
-            new Truck("T2",resourcesForT2,timeToAreaT2),
-        };
-        var management = new ResourceManagement();
-        var result = management.computedResource(areas, trucks);
+        return "remove cache redis db";
+    }
+
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<ResourceManagementResult[]>> assignment()
+    {
+        var areas = await context.areas.ToListAsync();
+        var trucks = await context.trucks.ToListAsync();
+        var result = resourceManagement.computedResource(
+            areas.Select(area => new Area
+            (
+                "A" + area.id,
+                area.urgencyLevel,
+                area.requiredResources,
+                area.timeConstraint
+            )).ToList(),
+
+            trucks.Select(truck => new Truck
+            (
+                "T" + truck.id,
+                truck.resources,
+                truck.timeToTravel
+            )).ToList());
         var successCase = result.Where(x => x.successedCase != null).Select(x => x.successedCase!).ToArray();
-        var truckUsed = successCase.Select(x => x.truckDelivered).ToArray();
-        var areaDelivered = successCase.Select(x => x.areaDelivered).ToArray();
-        var resourceMapped = successCase.Select(x => x.mapped).ToArray();
-        return Ok(result);
+        var truckUsed = successCase.Select(x => new TruckModel
+        {
+            canUse = false,
+            id = Int32.Parse(x.truckDelivered.getId().Replace("T", "")),
+            resources = x.truckDelivered.getAvaliableResources(),
+            timeToTravel = x.truckDelivered.getTravelTimeToArea(),
+        }).ToList();
+        var areaDelivered = successCase.Select(x => new AreaModel
+        {
+            hasDelivered = true,
+            id = Int32.Parse(x.areaDelivered.getId().Replace("A", "")),
+            requiredResources = x.areaDelivered.getRequiredResources(),
+            timeConstraint = x.areaDelivered.getTimeConstraint(),
+            urgencyLevel = x.areaDelivered.getUrgencyLevel(),
+        }).ToArray();
+        var resourceMapped = successCase.Select(x => new AssignmentModel
+        {
+            areaId = Int32.Parse(x.mapped.areaId.Replace("A", "")),
+            resources = x.mapped.resourcesDelivered,
+            truckId = Int32.Parse(x.mapped.truckId.Replace("T", "")),
+        }).ToArray();
+        context.trucks.UpdateRange(truckUsed);
+        context.areas.UpdateRange(areaDelivered);
+        context.assignments.AddRange(resourceMapped);
+        return Ok(successCase.Select(x => x.mapped));
     }
 }

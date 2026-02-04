@@ -41,6 +41,8 @@ public class AppContext : DbContext
         .IsRequired();
     }
     #endregion
-    public DbSet<TruckModel> truckItems { get; set; } = null!;
+    public DbSet<TruckModel> trucks { get; set; } = null!;
+    public DbSet<AreaModel> areas { get; set; } = null!;
+    public DbSet<AssignmentModel> assignments { get; set; } = null!;
 }
 

@@ -1,16 +1,10 @@
-
-
-using System.Threading.Tasks;
-using Org.BouncyCastle.Crypto.Prng;
-using TruckApi.Models;
-
 [Route("[controller]")]
 [ApiController]
-public class TruckController : ControllerBase
+public class TrucksController : ControllerBase
 {
     private readonly AppContext context;
 
-    public TruckController(AppContext _context)
+    public TrucksController(AppContext _context)
     {
         this.context = _context;
     }
@@ -19,34 +13,22 @@ public class TruckController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public ActionResult<TruckModel[]> index()
     {
-        var item = context.truckItems.Where(x => true).ToArray();
+        var item = context.trucks.Where(x => true).ToArray();
         return item;
     }
 
-    [HttpGet("create")]
+    [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<TruckModel>> create()
+    public async Task<ActionResult<TruckModel>> create([FromBody] CreateTruckBody model)
     {
         var item = new TruckModel
         {
             canUse = true,
-            resources = new Dictionary<string, int>
-            {
-                {
-                    "medicine",40
-                }
-            },
-            timeToTravel = new Dictionary<string, int>
-            {
-                {
-                    "A3",40
-                }
-            },
-
+            resources = model.resources,
+            timeToTravel = model.timeToTravel,
         };
-        context.truckItems.Add(item);
+        context.trucks.Add(item);
         await context.SaveChangesAsync();
-        await context.Entry(item).ReloadAsync();
         return Ok(item);
     }
 }
