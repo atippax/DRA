@@ -1,5 +1,4 @@
 using StackExchange.Redis;
-
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -10,8 +9,10 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 
     });
 builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("Redis") ?? "localhost"));
-
-builder.Services.AddScoped<IResourceManagement, ResourceManagement>();
+builder.Services.AddSingleton<IResourceManagement, ResourceManagement>();
+builder.Services.AddScoped<AssignmentService, AssignmentService>();
+builder.Services.AddScoped<AreasService, AreasService>();
+builder.Services.AddScoped<TrucksService, TrucksService>();
 builder.Services.AddDbContext<AppContext>(options =>
     options.UseMySql(
         builder.Configuration.GetConnectionString("Default"),

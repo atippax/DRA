@@ -1,34 +1,36 @@
+using System.Threading.Tasks;
+
 [Route("[controller]")]
 [ApiController]
 public class TrucksController : ControllerBase
 {
-    private readonly AppContext context;
+    private readonly TrucksService trucksService;
 
-    public TrucksController(AppContext _context)
+    public TrucksController(TrucksService trucksService)
     {
-        this.context = _context;
+        this.trucksService = trucksService;
+    }
+
+    [HttpDelete]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<bool>> delete()
+    {
+        await trucksService.deleteAllTrucks();
+        return Ok();
     }
 
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public ActionResult<TruckModel[]> index()
+    public async Task<ActionResult<TruckModel[]>> index()
     {
-        var item = context.trucks.Where(x => true).ToArray();
-        return item;
+        var item = await trucksService.getAllTrucks();
+        return Ok(item);
     }
 
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<TruckModel>> create([FromBody] CreateTruckBody model)
     {
-        var item = new TruckModel
-        {
-            canUse = true,
-            resources = model.resources,
-            timeToTravel = model.timeToTravel,
-        };
-        context.trucks.Add(item);
-        await context.SaveChangesAsync();
-        return Ok(item);
+        return Ok(await trucksService.create(model));
     }
 }

@@ -20,4 +20,5 @@ public class AreaModel
 
     [Column("has_delivered")]
     public bool hasDelivered { get; set; }
+
 }

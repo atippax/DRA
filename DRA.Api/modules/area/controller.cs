@@ -2,26 +2,23 @@
 [ApiController]
 public class AreasController : ControllerBase
 {
-    private readonly AppContext context;
+    private readonly AreasService areasService;
 
-    public AreasController(AppContext _context)
+    public AreasController(AreasService areasService)
     {
-        this.context = _context;
+        this.areasService = areasService;
     }
-
+    [HttpDelete]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<bool>> delete()
+    {
+        await areasService.deleteAllAreas();
+        return Ok();
+    }
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    async public Task<ActionResult<Area>> create([FromBody] CreateAreaBody model)
+    async public Task<ActionResult<AreaModel>> create([FromBody] CreateAreaBody model)
     {
-        var item = new AreaModel
-        {
-            hasDelivered = false,
-            requiredResources = model.requiredResource,
-            timeConstraint = model.timeConstraint,
-            urgencyLevel = model.urgencyLevel,
-        };
-        context.areas.Add(item);
-        await context.SaveChangesAsync();
-        return Ok(item);
+        return Ok(await areasService.create(model));
     }
 }
