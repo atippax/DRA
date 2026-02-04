@@ -9,13 +9,9 @@ builder.Services.AddControllers().AddJsonOptions(options =>
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
 
     });
-// Source - https://stackoverflow.com/a/50653358
-// Posted by Trey Dibler, modified by community. See post 'Timeline' for change history
-// Retrieved 2026-02-04, License - CC BY-SA 4.0
-
 builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("Redis") ?? "localhost"));
 
-// builder.Services.AddScoped<IResourceManagement, ResourceManagement>();
+builder.Services.AddScoped<IResourceManagement, ResourceManagement>();
 builder.Services.AddDbContext<AppContext>(options =>
     options.UseMySql(
         builder.Configuration.GetConnectionString("Default"),

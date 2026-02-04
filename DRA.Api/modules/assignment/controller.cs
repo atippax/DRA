@@ -39,8 +39,8 @@ public class AssignmentsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<ResourceManagementResult[]>> assignment()
     {
-        var areas = await context.areas.ToListAsync();
-        var trucks = await context.trucks.ToListAsync();
+        var areas = await context.areas.Where(x => !x.hasDelivered).ToListAsync();
+        var trucks = await context.trucks.Where(x => x.canUse).ToListAsync();
         var result = resourceManagement.computedResource(
             areas.Select(area => new Area
             (
@@ -57,29 +57,24 @@ public class AssignmentsController : ControllerBase
                 truck.timeToTravel
             )).ToList());
         var successCase = result.Where(x => x.successedCase != null).Select(x => x.successedCase!).ToArray();
-        var truckUsed = successCase.Select(x => new TruckModel
-        {
-            canUse = false,
-            id = Int32.Parse(x.truckDelivered.getId().Replace("T", "")),
-            resources = x.truckDelivered.getAvaliableResources(),
-            timeToTravel = x.truckDelivered.getTravelTimeToArea(),
-        }).ToList();
-        var areaDelivered = successCase.Select(x => new AreaModel
-        {
-            hasDelivered = true,
-            id = Int32.Parse(x.areaDelivered.getId().Replace("A", "")),
-            requiredResources = x.areaDelivered.getRequiredResources(),
-            timeConstraint = x.areaDelivered.getTimeConstraint(),
-            urgencyLevel = x.areaDelivered.getUrgencyLevel(),
-        }).ToArray();
+        var truckUsedIds = successCase.Select(x => Int32.Parse(x.truckDelivered.getId().Replace("T", ""))).ToList();
+        var areaDeliveredIds = successCase.Select(x => Int32.Parse(x.areaDelivered.getId().Replace("A", ""))).ToArray();
         var resourceMapped = successCase.Select(x => new AssignmentModel
         {
             areaId = Int32.Parse(x.mapped.areaId.Replace("A", "")),
             resources = x.mapped.resourcesDelivered,
             truckId = Int32.Parse(x.mapped.truckId.Replace("T", "")),
         }).ToArray();
-        context.trucks.UpdateRange(truckUsed);
-        context.areas.UpdateRange(areaDelivered);
+
+        var truckEntities = await context.trucks.Where(x => truckUsedIds.Any(f => f == x.id)).ToListAsync();
+        truckEntities.ForEach(x => x.canUse = false);
+        context.trucks.UpdateRange(truckEntities);
+
+
+        var areaEntities = await context.areas.Where(x => areaDeliveredIds.Any(f => f == x.id)).ToListAsync();
+        areaEntities.ForEach(x => x.hasDelivered = true);
+        context.areas.UpdateRange(areaEntities);
+
         context.assignments.AddRange(resourceMapped);
         var resultToPreview = successCase.Select(x => x.mapped).ToList();
         redis.KeyDelete("assignment");
