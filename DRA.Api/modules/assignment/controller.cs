@@ -1,4 +1,6 @@
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using StackExchange.Redis;
 
 [Route("[controller]")]
 [ApiController]
@@ -6,26 +8,31 @@ public class AssignmentsController : ControllerBase
 {
     private readonly AppContext context;
     private readonly IResourceManagement resourceManagement;
+    private readonly IDatabase redis;
 
-    public AssignmentsController(AppContext _context, IResourceManagement resourceManagement)
+    public AssignmentsController(AppContext _context, IResourceManagement resourceManagement, IConnectionMultiplexer _connectionMultiplexer)
     {
         this.context = _context;
+        this.redis = _connectionMultiplexer.GetDatabase();
         this.resourceManagement = resourceManagement;
+
     }
 
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public ActionResult<string> index()
+    public ActionResult<ResourceMapper[]> index()
     {
-        return "return redis cache";
+        var assignmented = redis.ListRange("assignment");
+        var result = assignmented.Select(s => JsonConvert.DeserializeObject<ResourceMapper>(s)).ToArray();
+        return result ?? [];
     }
 
 
     [HttpDelete]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public ActionResult<string> delete()
+    public ActionResult<bool> delete()
     {
-        return "remove cache redis db";
+        return redis.KeyDelete("assignment");
     }
 
     [HttpPost]
@@ -74,6 +81,13 @@ public class AssignmentsController : ControllerBase
         context.trucks.UpdateRange(truckUsed);
         context.areas.UpdateRange(areaDelivered);
         context.assignments.AddRange(resourceMapped);
-        return Ok(successCase.Select(x => x.mapped));
+        var resultToPreview = successCase.Select(x => x.mapped).ToList();
+        redis.KeyDelete("assignment");
+        resultToPreview.ForEach(assign =>
+        {
+            redis.ListRightPush("assignment", JsonConvert.SerializeObject(assign));
+        });
+        redis.KeyExpire("assignment", new TimeSpan(0, 30, 0));
+        return Ok(resultToPreview);
     }
 }
