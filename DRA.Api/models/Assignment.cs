@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-[Table("truck")]
-public class TruckModel
+[Table("assignment")]
+public class AssignmentModel
 {
 
     [Column("id")]
@@ -13,9 +13,9 @@ public class TruckModel
     [Column("resources")]
     public Dictionary<string, int> resources { get; set; }
 
-    [Column("time_to_travel")]
-    public Dictionary<string, int> timeToTravel { get; set; }
+    [Column("area_id")]
+    public int areaId { get; set; }
 
-    [Column("can_use")]
-    public bool canUse { get; set; }
+    [Column("truck_id")]
+    public int truckId { get; set; }
 }

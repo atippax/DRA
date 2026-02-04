@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DRA.Api", "DRA.Api.csproj", "{8907CB31-3DA6-7FEA-49EB-7C665387E7CA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8907CB31-3DA6-7FEA-49EB-7C665387E7CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8907CB31-3DA6-7FEA-49EB-7C665387E7CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8907CB31-3DA6-7FEA-49EB-7C665387E7CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8907CB31-3DA6-7FEA-49EB-7C665387E7CA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A54B0161-63E5-4202-B509-ACFD4416557B}
+	EndGlobalSection
+EndGlobal
