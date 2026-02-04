@@ -21,7 +21,7 @@ public class TrucksService
     }
     public async Task<TruckModel[]> getAllTrucks()
     {
-        var item = await context.trucks.Where(x => true).ToArrayAsync();
+        var item = await context.trucks.Where(x => x.canUse).ToArrayAsync();
         return item;
     }
 

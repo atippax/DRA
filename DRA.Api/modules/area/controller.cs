@@ -15,6 +15,15 @@ public class AreasController : ControllerBase
         await areasService.deleteAllAreas();
         return Ok();
     }
+
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<AreaModel[]>> index()
+    {
+        var item = await areasService.getAllAreas();
+        return Ok(item);
+    }
+
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     async public Task<ActionResult<AreaModel>> create([FromBody] CreateAreaBody model)

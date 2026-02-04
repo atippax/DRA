@@ -16,6 +16,11 @@ public class AreasService
             await context.SaveChangesAsync();
         }
     }
+    public async Task<AreaModel[]> getAllAreas()
+    {
+        var item = await context.areas.Where(x => !x.hasDelivered).ToArrayAsync();
+        return item;
+    }
     async public Task<AreaModel> create(CreateAreaBody model)
     {
         var item = new AreaModel
