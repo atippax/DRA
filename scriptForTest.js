@@ -1,4 +1,4 @@
-const baseUrl = "http://localhost:5170";
+const baseUrl = "https://dra-service-hzfjhyhqhthqhpd5.eastasia-01.azurewebsites.net";
 function sendPost(controller, body) {
   return fetch(`${baseUrl}/api/${controller}`, {
     method: "POST",
