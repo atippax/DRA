@@ -6,7 +6,11 @@ public class AreasService
     {
         this.context = _context;
     }
-
+    public async Task update(IEnumerable<AreaModel> areaEntities)
+    {
+        context.areas.UpdateRange(areaEntities);
+        await context.SaveChangesAsync();
+    }
     public async Task deleteAllAreas()
     {
         var areas = await context.areas.ToListAsync();
