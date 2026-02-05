@@ -87,7 +87,6 @@ public class ResourceManagement : IResourceManagement
         }
         catch (Exception ex)
         {
-
             var errorCase = new ErrorCase
             {
                 areaId = areaNeedToDelivery.getId(),
@@ -101,10 +100,12 @@ public class ResourceManagement : IResourceManagement
     }
     public ResourceManagementResult[] computedResource(List<Area> areas, List<Truck> trucks)
     {
+        if(areas.Count()==0) throw new Exception("no any area to delivery!");
+        if(trucks.Count()==0) throw new Exception("no any truck are ready to work!");
         var _areas = new List<Area>(areas);
         var sorter = new SortArea();
         _areas.Sort(sorter);
-        var resourcesMapped = this.computed(_areas, trucks);
+        var resourcesMapped = computed(_areas, trucks);
         if (resourcesMapped.Length == 0 && _areas.Count() != 0)
             throw new Exception("Insufficient resources for any area.");
         return resourcesMapped;
