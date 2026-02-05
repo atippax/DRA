@@ -8,14 +8,14 @@ builder.Services.AddControllers().AddJsonOptions(options =>
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
 
     });
-builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("Redis") ?? "localhost"));
+builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(Environment.GetEnvironmentVariable("RedisConnectionString")));
 builder.Services.AddSingleton<IResourceManagement, ResourceManagement>();
 builder.Services.AddScoped<AssignmentService, AssignmentService>();
 builder.Services.AddScoped<AreasService, AreasService>();
 builder.Services.AddScoped<TrucksService, TrucksService>();
 builder.Services.AddDbContext<AppContext>(options =>
     options.UseMySql(
-        builder.Configuration.GetConnectionString("Default"),
+        Environment.GetEnvironmentVariable("mysqlConnectionString"),
         new MySqlServerVersion(new Version(9, 0, 0))
         ));
 
