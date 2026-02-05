@@ -41,6 +41,11 @@ public class AssignmentsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<ResourceManagementResult[]>> assignment()
     {
-        return Ok(await assignmentService.assignmentToArea());
+        try {
+            return Ok(await assignmentService.assignmentToArea());
+        }
+        catch (Exception ex) { 
+            return BadRequest(ex.Message);
+        }
     }
 }
