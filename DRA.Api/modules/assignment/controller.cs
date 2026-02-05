@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using StackExchange.Redis;
 
-[Route("[controller]")]
+[Route("api/[controller]")]
 [ApiController]
 public class AssignmentsController : ControllerBase
 {
@@ -18,6 +18,14 @@ public class AssignmentsController : ControllerBase
     public async Task<ActionResult<ResourceMapper[]>> index()
     {
         return Ok(await assignmentService.getAssignmentInRedis());
+    }
+
+    [HttpDelete("reset")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult> reset()
+    {
+        await assignmentService.deleteAssigmnents();
+        return Ok(true);
     }
 
 
