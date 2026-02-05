@@ -73,7 +73,12 @@ public class AssignmentService
 
         context.assignments.AddRange(resourceMapped);
         var resultToPreview = successCase.Select(x => x.mapped).ToList();
+        var existRedis = await redis.ListRangeAsync(redisAssignmentKey);
         redis.KeyDelete(redisAssignmentKey);
+        existRedis.ToList().ForEach(x =>
+        {
+            redis.ListRightPush(redisAssignmentKey, x);
+        });
         resultToPreview.ForEach(assign =>
         {
             redis.ListRightPush(redisAssignmentKey, JsonConvert.SerializeObject(assign));

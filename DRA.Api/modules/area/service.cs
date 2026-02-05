@@ -23,6 +23,8 @@ public class AreasService
     }
     async public Task<AreaModel> create(CreateAreaBody model)
     {
+        if (model.urgencyLevel < 1 || model.urgencyLevel > 5)
+            throw new Exception("urgency level not in range");
         var item = new AreaModel
         {
             hasDelivered = false,

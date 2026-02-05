@@ -53,6 +53,7 @@ public class ResourceManagement : IResourceManagement
                 return trackItem >= item.Value;
             })
         );
+        if (truckResourceAvaliable.Count() == 0) throw new Exception("No trucks available any resources");
         var truckCanDelivery = truckResourceAvaliable.Where(truck => area.getRequiredResources().All((item) =>
             {
                 truck.getTravelTimeToArea().TryGetValue(areaKey, out var timeDelivery);
