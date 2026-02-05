@@ -28,7 +28,7 @@ jobs:
         working-directory: ./DRA.Api
 
       - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
+        run: dotnet publish ./DRA.Api/DRA.Api.csproj -c Release -o ${{env.DOTNET_ROOT}}/myapp
         working-directory: ./DRA.Api
 
       - name: Upload artifact for deployment job
