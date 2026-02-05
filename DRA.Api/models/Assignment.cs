@@ -10,8 +10,8 @@ public class AssignmentModel
     [Key]
     public int id { get; set; }
 
-    [Column("resources")]
-    public Dictionary<string, int> resources { get; set; }
+    [Column("resources_delivered")]
+    public Dictionary<string, int> resourcesDelivered { get; set; }
 
     [Column("area_id")]
     public int areaId { get; set; }
