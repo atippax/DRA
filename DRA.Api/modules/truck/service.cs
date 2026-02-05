@@ -9,7 +9,11 @@ public class TrucksService
     }
 
 
-
+    public async Task update(IEnumerable<TruckModel> truckEntities)
+    {
+        context.trucks.UpdateRange(truckEntities);
+        await context.SaveChangesAsync();
+    }
     public async Task deleteAllTrucks()
     {
         var trucks = await context.trucks.ToListAsync();
