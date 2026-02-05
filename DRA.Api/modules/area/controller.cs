@@ -1,4 +1,4 @@
-[Route("[controller]")]
+[Route("api/[controller]")]
 [ApiController]
 public class AreasController : ControllerBase
 {
@@ -13,7 +13,7 @@ public class AreasController : ControllerBase
     public async Task<ActionResult<bool>> delete()
     {
         await areasService.deleteAllAreas();
-        return Ok();
+        return Ok(true);
     }
 
     [HttpGet]
