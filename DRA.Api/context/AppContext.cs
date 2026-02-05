@@ -22,7 +22,7 @@ public class AppContext : DbContext
             v => JsonSerializer.Deserialize<Dictionary<string, int>>(v, new JsonSerializerOptions(JsonSerializerDefaults.General))!)
         .IsRequired();
         modelBuilder.Entity<AssignmentModel>()
-        .Property(b => b.resources)
+        .Property(b => b.resourcesDelivered)
         .HasConversion(
             v => JsonSerializer.Serialize(v, new JsonSerializerOptions(JsonSerializerDefaults.General)),
             v => JsonSerializer.Deserialize<Dictionary<string, int>>(v, new JsonSerializerOptions(JsonSerializerDefaults.General))!)
