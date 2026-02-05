@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-[Route("[controller]")]
+[Route("api/[controller]")]
 [ApiController]
 public class TrucksController : ControllerBase
 {
@@ -16,7 +16,7 @@ public class TrucksController : ControllerBase
     public async Task<ActionResult<bool>> delete()
     {
         await trucksService.deleteAllTrucks();
-        return Ok();
+        return Ok(true);
     }
 
     [HttpGet]
